@@ -1,0 +1,1173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>MamaCare PG</title>
+<style>
+:root{--purple:#6B3FA0;--purple-dark:#4e2d78;--pink:#F472B6;--pink-light:#fce7f3;--cream:#FFF8F0;--green:#10b981;--orange:#f59e0b;--blue:#3b82f6;--red:#ef4444;--gray:#6b7280;--white:#ffffff;--shadow:0 4px 20px rgba(107,63,160,0.12);}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Segoe UI',sans-serif;background:var(--cream);color:#1f2937;}
+nav{background:var(--purple);padding:0 16px;display:flex;align-items:center;justify-content:space-between;height:60px;position:sticky;top:0;z-index:200;box-shadow:0 2px 10px rgba(0,0,0,0.2);}
+.nav-logo{color:white;font-size:1.2rem;font-weight:700;display:flex;align-items:center;gap:6px;}
+.nav-right{display:flex;align-items:center;gap:8px;flex-wrap:nowrap;}
+.nav-btn{background:rgba(255,255,255,0.18);border:1px solid rgba(255,255,255,0.4);color:white;padding:5px 11px;border-radius:20px;cursor:pointer;font-size:0.8rem;white-space:nowrap;transition:background 0.2s;}
+.nav-btn:hover{background:rgba(255,255,255,0.32);}
+.nav-user{color:white;font-size:0.85rem;display:none;}
+.screen{display:none;min-height:calc(100vh - 60px);}
+.screen.active{display:block;}
+/* LOGIN */
+#loginScreen{background:linear-gradient(135deg,var(--purple) 0%,#9333ea 50%,var(--pink) 100%);display:flex;align-items:center;justify-content:center;padding:32px 16px;}
+#loginScreen.active{display:flex;}
+.login-card{background:white;border-radius:24px;padding:36px 28px;max-width:400px;width:100%;box-shadow:0 20px 60px rgba(0,0,0,0.25);text-align:center;}
+.login-card .logo-big{font-size:2.8rem;margin-bottom:6px;}
+.login-card h1{font-size:1.7rem;color:var(--purple);font-weight:800;}
+.login-card .tagline{color:var(--gray);font-size:0.9rem;margin:6px 0 24px;line-height:1.4;}
+.tabs{display:flex;background:#f3f4f6;border-radius:12px;padding:4px;margin-bottom:20px;}
+.tab-btn{flex:1;padding:10px;border:none;background:transparent;border-radius:8px;cursor:pointer;font-size:0.9rem;font-weight:600;color:var(--gray);transition:all 0.2s;}
+.tab-btn.active{background:var(--purple);color:white;}
+.form-group{margin-bottom:14px;text-align:left;}
+.form-group label{display:block;font-size:0.83rem;font-weight:600;color:#374151;margin-bottom:5px;}
+.form-group input,.form-group select{width:100%;padding:11px 13px;border:2px solid #e5e7eb;border-radius:10px;font-size:0.93rem;transition:border 0.2s;outline:none;background:white;}
+.form-group input:focus,.form-group select:focus{border-color:var(--purple);}
+.btn-primary{width:100%;padding:13px;background:linear-gradient(135deg,var(--purple),#9333ea);color:white;border:none;border-radius:12px;font-size:1rem;font-weight:700;cursor:pointer;transition:opacity 0.2s;margin-top:4px;}
+.btn-primary:hover{opacity:0.9;}
+.divider{color:var(--gray);font-size:0.82rem;margin:14px 0;}
+.guest-btn{width:100%;padding:11px;background:transparent;border:2px solid var(--purple);color:var(--purple);border-radius:12px;font-size:0.9rem;font-weight:600;cursor:pointer;transition:all 0.2s;}
+.guest-btn:hover{background:var(--pink-light);}
+.error-msg{color:var(--red);font-size:0.82rem;margin-top:6px;display:none;}
+/* ONBOARDING */
+#onboardScreen{background:var(--cream);padding:28px 16px;display:flex;align-items:flex-start;justify-content:center;}
+#onboardScreen.active{display:flex;}
+.onboard-card{background:white;border-radius:24px;padding:32px 24px;max-width:540px;width:100%;box-shadow:var(--shadow);}
+.progress-bar-wrap{background:#e5e7eb;border-radius:99px;height:8px;margin-bottom:26px;}
+.progress-bar{background:linear-gradient(90deg,var(--purple),var(--pink));border-radius:99px;height:100%;transition:width 0.4s;}
+.step{display:none;}
+.step.active{display:block;}
+.step-label{font-size:0.75rem;color:var(--purple);font-weight:700;letter-spacing:1px;text-transform:uppercase;margin-bottom:5px;}
+.step h2{font-size:1.35rem;color:#1f2937;font-weight:800;margin-bottom:5px;}
+.step>p{color:var(--gray);font-size:0.9rem;margin-bottom:20px;}
+.input-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px;}
+/* option cards */
+.options-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:20px;}
+.option-card{border:2px solid #e5e7eb;border-radius:14px;padding:14px 10px;cursor:pointer;text-align:center;transition:all 0.2s;user-select:none;}
+.option-card:hover{border-color:var(--purple);background:#f5f3ff;}
+.option-card.selected{border-color:var(--purple);background:#f5f3ff;}
+.option-card .icon{font-size:1.8rem;margin-bottom:5px;}
+.option-card .label{font-size:0.85rem;font-weight:600;color:#374151;}
+/* service checkboxes */
+.svc-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:20px;}
+.svc-item{display:flex;align-items:center;gap:9px;padding:11px 13px;border:2px solid #e5e7eb;border-radius:12px;cursor:pointer;transition:all 0.2s;user-select:none;}
+.svc-item:hover{border-color:var(--purple);background:#f5f3ff;}
+.svc-item.checked{border-color:var(--purple);background:#f5f3ff;}
+.svc-item input[type="checkbox"]{accent-color:var(--purple);width:17px;height:17px;cursor:pointer;pointer-events:none;}
+.svc-item .svc-label{font-size:0.85rem;font-weight:600;color:#374151;line-height:1.3;}
+/* insurance */
+.insurance-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-bottom:20px;}
+.ins-card{border:2px solid #e5e7eb;border-radius:12px;padding:13px 11px;cursor:pointer;transition:all 0.2s;text-align:center;user-select:none;}
+.ins-card:hover{border-color:var(--blue);background:#eff6ff;}
+.ins-card.selected{border-color:var(--blue);background:#eff6ff;}
+.ins-card .ins-name{font-size:0.88rem;font-weight:700;}
+.ins-card .ins-sub{font-size:0.72rem;color:var(--gray);margin-top:2px;}
+/* demographics */
+.demo-select{width:100%;padding:11px 13px;border:2px solid #e5e7eb;border-radius:10px;font-size:0.9rem;outline:none;background:white;margin-top:6px;cursor:pointer;}
+.demo-select:focus{border-color:var(--purple);}
+.race-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:8px 0 16px;}
+.race-item{display:flex;align-items:center;gap:8px;padding:10px 12px;border:2px solid #e5e7eb;border-radius:10px;cursor:pointer;transition:all 0.2s;font-size:0.83rem;font-weight:600;color:#374151;user-select:none;}
+.race-item:hover{border-color:var(--purple);background:#f5f3ff;}
+.race-item.checked{border-color:var(--purple);background:#f5f3ff;}
+.race-item input{accent-color:var(--purple);width:16px;height:16px;pointer-events:none;}
+/* nav buttons in steps */
+.step-nav{display:flex;gap:10px;margin-top:4px;}
+.btn-back{flex:1;padding:12px;background:#f3f4f6;color:#374151;border:none;border-radius:12px;font-size:0.9rem;font-weight:600;cursor:pointer;}
+.btn-next{flex:2;padding:12px;background:linear-gradient(135deg,var(--purple),#9333ea);color:white;border:none;border-radius:12px;font-size:0.9rem;font-weight:700;cursor:pointer;}
+/* DASHBOARD */
+#dashScreen{background:var(--cream);}
+#dashScreen.active{display:block;}
+.dash-hero{background:linear-gradient(135deg,var(--purple) 0%,#9333ea 60%,var(--pink) 100%);padding:24px 20px 28px;color:white;}
+.dash-hero h2{font-size:1.4rem;font-weight:800;}
+.dash-hero p{font-size:0.88rem;opacity:0.9;margin-top:4px;}
+.hero-pills{display:flex;gap:7px;margin-top:12px;flex-wrap:wrap;}
+.pill{background:rgba(255,255,255,0.2);border:1px solid rgba(255,255,255,0.35);color:white;padding:3px 11px;border-radius:20px;font-size:0.78rem;font-weight:600;}
+.dash-content{padding:20px 16px;max-width:700px;margin:0 auto;}
+/* quote */
+.quote-banner{background:linear-gradient(135deg,#fdf4ff,#fce7f3);border:1px solid #e9d5ff;border-radius:16px;padding:16px 18px;margin-bottom:20px;display:flex;align-items:flex-start;gap:10px;box-shadow:0 2px 10px rgba(107,63,160,0.07);}
+.quote-icon{font-size:1.5rem;flex-shrink:0;}
+.quote-body{flex:1;}
+.quote-text{font-size:0.92rem;color:#5b21b6;font-style:italic;line-height:1.6;font-weight:500;}
+.quote-author{font-size:0.77rem;color:#9333ea;font-style:normal;font-weight:700;margin-top:4px;display:block;}
+.quote-refresh{background:none;border:none;font-size:1.05rem;cursor:pointer;opacity:0.5;padding:4px;flex-shrink:0;transition:opacity 0.2s;}
+.quote-refresh:hover{opacity:1;}
+/* section title */
+.section-title{font-size:1.05rem;font-weight:800;color:#1f2937;margin:20px 0 12px;display:flex;align-items:center;gap:7px;}
+/* nutrition */
+.nutr-tabs{display:flex;gap:7px;margin-bottom:14px;flex-wrap:wrap;}
+.nutr-tab{padding:7px 14px;border-radius:20px;border:2px solid #e5e7eb;background:white;cursor:pointer;font-size:0.82rem;font-weight:600;color:var(--gray);transition:all 0.2s;}
+.nutr-tab.active{background:var(--green);border-color:var(--green);color:white;}
+.nutr-panel{display:none;}
+.nutr-panel.active{display:block;}
+.nutr-card{background:white;border-radius:14px;padding:16px;box-shadow:var(--shadow);margin-bottom:12px;border-left:4px solid var(--green);}
+.nutr-card.orange{border-left-color:var(--orange);}
+.nutr-card.blue{border-left-color:var(--blue);}
+.nutr-card.pink{border-left-color:var(--pink);}
+.nutr-card-title{font-size:0.93rem;font-weight:800;color:#1f2937;margin-bottom:6px;display:flex;align-items:center;gap:7px;}
+.nutr-list{list-style:none;padding:0;margin-top:8px;display:flex;flex-direction:column;gap:5px;}
+.nutr-list li{display:flex;align-items:flex-start;gap:7px;font-size:0.85rem;color:#374151;}
+.nutr-list li::before{content:'✓';color:var(--green);font-weight:900;flex-shrink:0;}
+.nutr-tip{background:#f0fdf4;border:1px solid #bbf7d0;border-radius:10px;padding:9px 13px;margin-top:10px;font-size:0.82rem;color:#166534;display:flex;gap:7px;}
+/* category tabs */
+.category-tabs{display:flex;gap:7px;overflow-x:auto;padding-bottom:4px;margin-bottom:16px;scrollbar-width:none;}
+.category-tabs::-webkit-scrollbar{display:none;}
+.cat-tab{white-space:nowrap;padding:7px 14px;border-radius:20px;border:2px solid #e5e7eb;background:white;cursor:pointer;font-size:0.82rem;font-weight:600;color:var(--gray);transition:all 0.2s;}
+.cat-tab.active{background:var(--purple);border-color:var(--purple);color:white;}
+/* resource cards */
+.resource-cards{display:flex;flex-direction:column;gap:14px;}
+.resource-card{background:white;border-radius:16px;padding:16px;box-shadow:var(--shadow);border-left:4px solid var(--purple);transition:transform 0.2s;}
+.resource-card:hover{transform:translateY(-2px);}
+.resource-card.green{border-left-color:var(--green);}
+.resource-card.orange{border-left-color:var(--orange);}
+.resource-card.blue{border-left-color:var(--blue);}
+.resource-card.pink{border-left-color:var(--pink);}
+.rc-header{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;}
+.rc-icon-title{display:flex;align-items:center;gap:9px;}
+.rc-icon{font-size:1.7rem;}
+.rc-title{font-size:0.95rem;font-weight:800;color:#1f2937;}
+.rc-org{font-size:0.77rem;color:var(--gray);margin-top:2px;}
+.rc-badge{font-size:0.7rem;font-weight:700;padding:3px 9px;border-radius:20px;white-space:nowrap;flex-shrink:0;}
+.badge-green{background:#d1fae5;color:#065f46;}
+.badge-blue{background:#dbeafe;color:#1e40af;}
+.badge-orange{background:#fef3c7;color:#92400e;}
+.badge-purple{background:#ede9fe;color:#5b21b6;}
+.rc-desc{font-size:0.85rem;color:#4b5563;margin-top:9px;line-height:1.5;}
+.rc-details{margin-top:10px;display:flex;flex-wrap:wrap;gap:7px;}
+.rc-detail{font-size:0.8rem;color:var(--gray);}
+.rc-actions{margin-top:12px;display:flex;gap:7px;flex-wrap:wrap;}
+.btn-sm{padding:7px 14px;border-radius:8px;font-size:0.8rem;font-weight:600;cursor:pointer;border:none;}
+.btn-purple{background:var(--purple);color:white;}
+.btn-outline{background:white;color:var(--purple);border:2px solid var(--purple);}
+.ins-match-banner{background:#d1fae5;border:1px solid #6ee7b7;border-radius:10px;padding:10px 14px;margin-top:10px;font-size:0.83rem;color:#065f46;display:flex;align-items:center;gap:7px;}
+.ins-no-match{background:#fef3c7;border:1px solid #fcd34d;border-radius:10px;padding:10px 14px;margin-top:10px;font-size:0.83rem;color:#92400e;display:flex;align-items:center;gap:7px;}
+/* events */
+.events-list{display:flex;flex-direction:column;gap:10px;}
+.event-card{background:white;border-radius:14px;padding:14px;box-shadow:var(--shadow);display:flex;gap:12px;align-items:flex-start;}
+.event-date{background:var(--purple);color:white;border-radius:10px;min-width:50px;text-align:center;padding:7px 5px;flex-shrink:0;}
+.event-date .month{font-size:0.68rem;font-weight:700;letter-spacing:1px;}
+.event-date .day{font-size:1.3rem;font-weight:900;line-height:1;}
+.event-info{flex:1;}
+.event-title{font-size:0.92rem;font-weight:700;}
+.event-meta{font-size:0.8rem;color:var(--gray);margin-top:2px;}
+.event-tags{margin-top:6px;display:flex;gap:5px;flex-wrap:wrap;}
+.tag{font-size:0.7rem;font-weight:700;padding:2px 7px;border-radius:99px;}
+.tag-pink{background:var(--pink-light);color:#9d174d;}
+.tag-green{background:#d1fae5;color:#065f46;}
+.tag-blue{background:#dbeafe;color:#1e40af;}
+.reg-btn{margin-top:9px;padding:6px 13px;background:var(--purple);color:white;border:none;border-radius:8px;font-size:0.78rem;font-weight:700;cursor:pointer;}
+/* modal */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:500;display:flex;align-items:center;justify-content:center;padding:16px;opacity:0;pointer-events:none;transition:opacity 0.2s;}
+.modal-overlay.open{opacity:1;pointer-events:all;}
+.modal-box{background:white;border-radius:22px;padding:26px 22px;max-width:400px;width:100%;box-shadow:0 20px 60px rgba(0,0,0,0.22);transform:translateY(20px);transition:transform 0.25s;}
+.modal-overlay.open .modal-box{transform:translateY(0);}
+.modal-title{font-size:1.1rem;font-weight:800;color:#1f2937;margin-bottom:5px;}
+.modal-sub{font-size:0.83rem;color:var(--gray);margin-bottom:18px;}
+.modal-actions{display:flex;gap:9px;margin-top:18px;}
+.modal-cancel{flex:1;padding:11px;background:#f3f4f6;border:none;border-radius:11px;font-size:0.88rem;font-weight:600;cursor:pointer;}
+.modal-confirm{flex:2;padding:11px;background:linear-gradient(135deg,var(--purple),#9333ea);color:white;border:none;border-radius:11px;font-size:0.88rem;font-weight:700;cursor:pointer;}
+.reg-success{background:#d1fae5;border:1px solid #6ee7b7;border-radius:10px;padding:11px 14px;font-size:0.85rem;color:#065f46;display:none;margin-top:10px;}
+/* chat */
+.chat-fab{position:fixed;bottom:22px;right:22px;z-index:999;width:56px;height:56px;border-radius:50%;background:linear-gradient(135deg,var(--purple),#9333ea);color:white;font-size:1.4rem;border:none;cursor:pointer;box-shadow:0 6px 22px rgba(107,63,160,0.42);display:none;align-items:center;justify-content:center;transition:transform 0.2s;}
+.chat-fab.visible{display:flex;}
+.chat-fab:hover{transform:scale(1.07);}
+.chat-window{position:fixed;bottom:90px;right:22px;z-index:998;width:330px;max-width:calc(100vw - 28px);background:white;border-radius:20px;box-shadow:0 12px 44px rgba(0,0,0,0.17);display:flex;flex-direction:column;overflow:hidden;transition:opacity 0.25s,transform 0.25s;}
+.chat-window.chat-hidden{opacity:0;pointer-events:none;transform:translateY(14px) scale(0.97);}
+.chat-header{background:linear-gradient(135deg,var(--purple),#9333ea);color:white;padding:13px 16px;display:flex;align-items:center;justify-content:space-between;}
+.chat-header-title{font-size:0.95rem;font-weight:700;display:flex;align-items:center;gap:7px;}
+.chat-close{background:none;border:none;color:white;font-size:1.15rem;cursor:pointer;opacity:0.8;}
+.chat-close:hover{opacity:1;}
+.chat-messages{height:260px;overflow-y:auto;padding:12px;display:flex;flex-direction:column;gap:9px;background:#fafafa;}
+.msg{max-width:86%;padding:9px 13px;border-radius:13px;font-size:0.855rem;line-height:1.45;}
+.msg-bot{background:#ede9fe;color:#3b0764;align-self:flex-start;border-bottom-left-radius:4px;}
+.msg-user{background:var(--purple);color:white;align-self:flex-end;border-bottom-right-radius:4px;}
+.chat-quick{padding:9px 12px;display:flex;flex-wrap:wrap;gap:5px;background:white;border-top:1px solid #f3f4f6;}
+.quick-btn{font-size:0.73rem;padding:5px 9px;border-radius:20px;border:1.5px solid var(--purple);color:var(--purple);background:white;cursor:pointer;transition:all 0.15s;font-weight:600;}
+.quick-btn:hover{background:var(--purple);color:white;}
+.chat-input-row{display:flex;gap:7px;padding:9px 12px;background:white;border-top:1px solid #e5e7eb;}
+.chat-input{flex:1;padding:8px 12px;border:1.5px solid #e5e7eb;border-radius:20px;font-size:0.855rem;outline:none;}
+.chat-input:focus{border-color:var(--purple);}
+.chat-send{width:34px;height:34px;border-radius:50%;background:var(--purple);color:white;border:none;cursor:pointer;font-size:0.95rem;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+/* toast */
+.toast{position:fixed;top:68px;right:14px;z-index:900;background:white;border-radius:13px;padding:12px 16px;box-shadow:0 8px 28px rgba(0,0,0,0.13);max-width:280px;display:flex;align-items:flex-start;gap:9px;transform:translateX(320px);transition:transform 0.35s;border-left:4px solid var(--purple);}
+.toast.show{transform:translateX(0);}
+.toast-icon{font-size:1.2rem;flex-shrink:0;}
+.toast-body{font-size:0.83rem;color:#1f2937;line-height:1.4;}
+.toast-body strong{display:block;margin-bottom:2px;}
+.hidden{display:none!important;}
+@media(max-width:480px){
+  .options-grid,.insurance-grid,.svc-grid,.input-row,.race-grid{grid-template-columns:1fr;}
+  .login-card{padding:26px 18px;}
+  .onboard-card{padding:22px 16px;}
+  .chat-window{width:calc(100vw - 24px);right:12px;}
+  .chat-fab{right:12px;bottom:14px;}
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-logo"><span>🌸</span> MamaCare PG</div>
+  <div class="nav-right">
+    <button class="nav-btn" onclick="toggleLang()">🌐 <span id="langLabel">Español</span></button>
+    <button class="nav-btn" id="trackerNavBtn" style="display:none" onclick="showScreen('trackerScreen')">🤰 My Pregnancy</button>
+    <span class="nav-user" id="navUser"></span>
+    <button class="nav-btn" id="logoutBtn" style="display:none" onclick="logout()">Log out</button>
+  </div>
+</nav>
+
+<!-- ════ LOGIN ════ -->
+<div class="screen active" id="loginScreen">
+  <div class="login-card">
+    <div class="logo-big">🌸</div>
+    <h1>MamaCare PG</h1>
+    <p class="tagline">Your guide to a healthy pregnancy in Prince George's County</p>
+    <div class="tabs">
+      <button class="tab-btn active" id="tabSignIn" onclick="switchTab('signin')">Sign In</button>
+      <button class="tab-btn" id="tabRegister" onclick="switchTab('register')">Create Account</button>
+    </div>
+    <div id="signinForm">
+      <div class="form-group"><label>Email address</label><input type="email" id="loginEmail" placeholder="you@email.com"/></div>
+      <div class="form-group"><label>Password</label><input type="password" id="loginPassword" placeholder="••••••••"/></div>
+      <p class="error-msg" id="loginError">Invalid email or password. Try demo@mamacare.com / password123</p>
+      <button class="btn-primary" onclick="doLogin()">Sign In</button>
+      <div class="divider">or</div>
+      <button class="guest-btn" onclick="guestLogin()">👀 Browse as Guest</button>
+    </div>
+    <div id="registerForm" style="display:none">
+      <div class="form-group"><label>Full name</label><input type="text" id="regName" placeholder="Maria Johnson"/></div>
+      <div class="form-group"><label>Email address</label><input type="email" id="regEmail" placeholder="you@email.com"/></div>
+      <div class="form-group"><label>Create password</label><input type="password" id="regPassword" placeholder="••••••••"/></div>
+      <button class="btn-primary" onclick="doRegister()">Create My Account</button>
+    </div>
+  </div>
+</div>
+
+<!-- ════ ONBOARDING ════ -->
+<div class="screen" id="onboardScreen">
+  <div class="onboard-card">
+    <div class="progress-bar-wrap"><div class="progress-bar" id="progressBar" style="width:20%"></div></div>
+
+    <!-- Step 1: Name & Age -->
+    <div class="step active" id="step1">
+      <div class="step-label">Step 1 of 5 · About You</div>
+      <h2>Welcome! Let's get to know you.</h2>
+      <p>This helps us find the right resources for you.</p>
+      <div class="input-row">
+        <div class="form-group"><label>Your First Name</label><input type="text" id="firstName" placeholder="Maria"/></div>
+        <div class="form-group"><label>Your Age</label><input type="number" id="age" placeholder="25" min="10" max="55"/></div>
+      </div>
+      <div class="input-row">
+        <div class="form-group"><label>ZIP Code</label><input type="text" id="zip" placeholder="20743" maxlength="5"/></div>
+        <div class="form-group"><label>Preferred Language</label>
+          <select id="prefLang" onchange="applyLangPref()">
+            <option value="en">English</option>
+            <option value="es">Español</option>
+          </select>
+        </div>
+      </div>
+      <div class="step-nav">
+        <button class="btn-next" style="flex:3" onclick="nextStep(1)">Continue →</button>
+      </div>
+    </div>
+
+    <!-- Step 2: Pregnancy Status -->
+    <div class="step" id="step2">
+      <div class="step-label">Step 2 of 5 · Your Situation</div>
+      <h2>Are you currently pregnant?</h2>
+      <p>Select all that apply to you.</p>
+      <div class="options-grid" id="statusGrid">
+        <div class="option-card" onclick="toggleStatus(this)" data-val="pregnant"><div class="icon">🤰</div><div class="label">Yes, I'm Pregnant</div></div>
+        <div class="option-card" onclick="toggleStatus(this)" data-val="newborn"><div class="icon">👶</div><div class="label">I Have a Newborn</div></div>
+        <div class="option-card" onclick="toggleStatus(this)" data-val="toddler"><div class="icon">🧒</div><div class="label">I Have a Young Child</div></div>
+        <div class="option-card" onclick="toggleStatus(this)" data-val="trying"><div class="icon">🌱</div><div class="label">Trying to Conceive</div></div>
+      </div>
+      <!-- Pregnancy detail — shown when pregnant selected -->
+      <div id="pregnancyDetail" style="display:none;margin-bottom:16px;">
+        <p style="font-size:0.88rem;color:#374151;font-weight:600;margin-bottom:10px;">Tell us more about your pregnancy:</p>
+        <div class="input-row">
+          <div class="form-group">
+            <label>Current Week (if known)</label>
+            <input type="number" id="pregWeek" placeholder="e.g. 12" min="1" max="42"/>
+          </div>
+          <div class="form-group">
+            <label>Date of Last Period</label>
+            <input type="date" id="lastPeriod"/>
+          </div>
+        </div>
+        <p style="font-size:0.78rem;color:var(--gray);">Enter either your week OR your last period date — we'll calculate the other.</p>
+      </div>
+      <!-- Other young kids -->
+      <div class="form-group" style="margin-bottom:18px;">
+        <label>Do you have other young children? (under age 5)</label>
+        <select id="otherKids" class="demo-select" style="margin-top:8px;">
+          <option value="">Select…</option>
+          <option value="none">No other young children</option>
+          <option value="1">Yes — 1 child</option>
+          <option value="2">Yes — 2 children</option>
+          <option value="3+">Yes — 3 or more children</option>
+        </select>
+      </div>
+      <div class="step-nav">
+        <button class="btn-back" onclick="prevStep(2)">← Back</button>
+        <button class="btn-next" onclick="nextStep(2)">Continue →</button>
+      </div>
+    </div>
+
+    <!-- Step 3: Insurance -->
+    <div class="step" id="step3">
+      <div class="step-label">Step 3 of 5 · Health Insurance</div>
+      <h2>What's your health insurance?</h2>
+      <p>We'll match you with providers that accept your plan.</p>
+      <div class="insurance-grid" id="insGrid">
+        <div class="ins-card" onclick="selectIns(this)" data-val="medicaid"><div class="ins-name">Medicaid / MCHP</div><div class="ins-sub">Maryland HealthChoice</div></div>
+        <div class="ins-card" onclick="selectIns(this)" data-val="priority"><div class="ins-name">Priority Partners</div><div class="ins-sub">Johns Hopkins plan</div></div>
+        <div class="ins-card" onclick="selectIns(this)" data-val="uhc"><div class="ins-name">UnitedHealthcare</div><div class="ins-sub">Community Plan</div></div>
+        <div class="ins-card" onclick="selectIns(this)" data-val="aetna"><div class="ins-name">Aetna Better Health</div><div class="ins-sub">Medicaid managed</div></div>
+        <div class="ins-card" onclick="selectIns(this)" data-val="private"><div class="ins-name">Private Insurance</div><div class="ins-sub">BCBS, Kaiser, etc.</div></div>
+        <div class="ins-card" onclick="selectIns(this)" data-val="none"><div class="ins-name">No Insurance</div><div class="ins-sub">I'll show you free options</div></div>
+      </div>
+      <div class="step-nav">
+        <button class="btn-back" onclick="prevStep(3)">← Back</button>
+        <button class="btn-next" onclick="nextStep(3)">Continue →</button>
+      </div>
+    </div>
+
+    <!-- Step 4: Services Needed -->
+    <div class="step" id="step4">
+      <div class="step-label">Step 4 of 5 · Services You Want</div>
+      <h2>What can we help you with?</h2>
+      <p>Check everything that applies — you can always change this later.</p>
+      <div class="svc-grid" id="svcGrid">
+        <label class="svc-item" onclick="toggleSvc(this)"><input type="checkbox" value="prenatal"/><span class="svc-label">🏥 Prenatal Care / OB-GYN</span></label>
+        <label class="svc-item" onclick="toggleSvc(this)"><input type="checkbox" value="wic"/><span class="svc-label">🥛 WIC Benefits</span></label>
+        <label class="svc-item" onclick="toggleSvc(this)"><input type="checkbox" value="snap"/><span class="svc-label">🛒 SNAP Food Assistance</span></label>
+        <label class="svc-item" onclick="toggleSvc(this)"><input type="checkbox" value="diapers"/><span class="svc-label">🧷 Free Diapers</span></label>
+        <label class="svc-item" onclick="toggleSvc(this)"><input type="checkbox" value="food"/><span class="svc-label">🍱 Food Pantries</span></label>
+        <label class="svc-item" onclick="toggleSvc(this)"><input type="checkbox" value="mental"/><span class="svc-label">💜 Mental Health Support</span></label>
+        <label class="svc-item" onclick="toggleSvc(this)"><input type="checkbox" value="insurance"/><span class="svc-label">📋 Help Getting Insurance</span></label>
+        <label class="svc-item" onclick="toggleSvc(this)"><input type="checkbox" value="daycare"/><span class="svc-label">🏫 Daycare &amp; Childcare</span></label>
+        <label class="svc-item" onclick="toggleSvc(this)"><input type="checkbox" value="scholarship"/><span class="svc-label">🎓 Childcare Scholarship</span></label>
+        <label class="svc-item" onclick="toggleSvc(this)"><input type="checkbox" value="teen"/><span class="svc-label">🧑 Teen &amp; Young Parent Services</span></label>
+        <label class="svc-item" onclick="toggleSvc(this)"><input type="checkbox" value="transport"/><span class="svc-label">🚌 Transportation to Appointments</span></label>
+        <label class="svc-item" onclick="toggleSvc(this)"><input type="checkbox" value="community"/><span class="svc-label">🤝 Community Groups</span></label>
+      </div>
+      <div class="step-nav">
+        <button class="btn-back" onclick="prevStep(4)">← Back</button>
+        <button class="btn-next" onclick="nextStep(4)">Continue →</button>
+      </div>
+    </div>
+
+    <!-- Step 5: Demographics (optional) -->
+    <div class="step" id="step5">
+      <div class="step-label">Step 5 of 5 · Your Background</div>
+      <h2>Help us serve you better.</h2>
+      <p>This is optional and confidential — used only to find culturally relevant resources.</p>
+      <div class="form-group">
+        <label>Race / Ethnicity <span style="font-weight:400;color:var(--gray)">(select all that apply)</span></label>
+        <div class="race-grid">
+          <label class="race-item" onclick="toggleRace(this)"><input type="checkbox" value="black"/>🖤 Black / African American</label>
+          <label class="race-item" onclick="toggleRace(this)"><input type="checkbox" value="hispanic"/>🌎 Hispanic / Latina</label>
+          <label class="race-item" onclick="toggleRace(this)"><input type="checkbox" value="white"/>⬜ White / Caucasian</label>
+          <label class="race-item" onclick="toggleRace(this)"><input type="checkbox" value="asian"/>🌸 Asian / Pacific Islander</label>
+          <label class="race-item" onclick="toggleRace(this)"><input type="checkbox" value="native"/>🌿 American Indian / Alaska Native</label>
+          <label class="race-item" onclick="toggleRace(this)"><input type="checkbox" value="multiracial"/>🌈 Multiracial / Mixed</label>
+          <label class="race-item" onclick="toggleRace(this)"><input type="checkbox" value="other_race"/>✳️ Other</label>
+          <label class="race-item" onclick="toggleRace(this)"><input type="checkbox" value="no_answer"/>🔒 Prefer not to answer</label>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Primary Language Spoken at Home</label>
+        <select id="homeLang" class="demo-select">
+          <option value="">Select…</option>
+          <option value="english">English</option>
+          <option value="spanish">Spanish / Español</option>
+          <option value="french">French / Français</option>
+          <option value="amharic">Amharic / አማርኛ</option>
+          <option value="portuguese">Portuguese / Português</option>
+          <option value="arabic">Arabic / عربي</option>
+          <option value="chinese">Chinese / 中文</option>
+          <option value="korean">Korean / 한국어</option>
+          <option value="vietnamese">Vietnamese / Tiếng Việt</option>
+          <option value="other_lang">Other</option>
+        </select>
+      </div>
+      <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:11px;padding:11px 14px;margin:12px 0 18px;font-size:0.8rem;color:#166534;">
+        🔒 Your answers are private and never shared or reported.
+      </div>
+      <div class="step-nav">
+        <button class="btn-back" onclick="prevStep(5)">← Back</button>
+        <button class="btn-next" style="flex:3" onclick="showDashboard()">View My Resources →</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════ DASHBOARD ════ -->
+<div class="screen" id="dashScreen">
+  <div class="dash-hero">
+    <h2 id="dashGreeting">Hi, Maria! 👋</h2>
+    <p>Here are your personalized resources in Prince George's County.</p>
+    <div class="hero-pills" id="heroPills">
+      <span class="pill" id="pillInsurance">Medicaid</span>
+      <span class="pill" id="pillZip">📍 20743</span>
+      <span class="pill">PG County, MD</span>
+    </div>
+  </div>
+
+  <div class="dash-content">
+
+    <!-- Daily Quote -->
+    <div class="quote-banner">
+      <div class="quote-icon">💜</div>
+      <div class="quote-body">
+        <div class="quote-text" id="quoteText"></div>
+        <span class="quote-author" id="quoteAuthor"></span>
+      </div>
+      <button class="quote-refresh" onclick="newQuote()" title="New quote">🔄</button>
+    </div>
+
+    <!-- Nutrition Guidance -->
+    <div class="section-title">🥗 Nutrition Guidance</div>
+    <div class="nutr-tabs">
+      <button class="nutr-tab active" onclick="switchNutr('prenatal',this)">🤰 During Pregnancy</button>
+      <button class="nutr-tab" onclick="switchNutr('postpartum',this)">🍼 After Birth</button>
+      <button class="nutr-tab" onclick="switchNutr('baby',this)">👶 Baby Feeding</button>
+    </div>
+
+    <div class="nutr-panel active" id="nutr-prenatal">
+      <div class="nutr-card">
+        <div class="nutr-card-title">🌿 Key Nutrients You Need</div>
+        <ul class="nutr-list">
+          <li><strong>Folic Acid (400–800 mcg/day)</strong> — prevents neural tube defects. Found in leafy greens, beans, fortified cereals.</li>
+          <li><strong>Iron (27 mg/day)</strong> — supports baby's blood and brain. Lean red meat, spinach, lentils — take with vitamin C.</li>
+          <li><strong>Calcium (1,000 mg/day)</strong> — builds baby's bones. Dairy, fortified OJ, broccoli, almonds.</li>
+          <li><strong>DHA / Omega-3</strong> — brain development. Salmon, sardines, walnuts, DHA-fortified eggs.</li>
+          <li><strong>Vitamin D (600 IU/day)</strong> — bone health. Sunlight + fortified milk + supplements.</li>
+          <li><strong>Protein (75–100g/day)</strong> — builds baby's tissues. Eggs, chicken, beans, Greek yogurt.</li>
+        </ul>
+        <div class="nutr-tip">💡 <span>Take a prenatal vitamin every day. Ask your WIC office for free prenatal vitamins — (301) 883-7870.</span></div>
+      </div>
+      <div class="nutr-card orange">
+        <div class="nutr-card-title">🍽️ What to Eat Each Day</div>
+        <ul class="nutr-list">
+          <li>Colorful fruits &amp; vegetables — aim for 5+ servings</li>
+          <li>Whole grains — oatmeal, brown rice, whole wheat bread</li>
+          <li>Lean protein — eggs, beans, chicken, fish (avoid shark/swordfish)</li>
+          <li>Dairy or fortified alternatives — milk, yogurt, cheese</li>
+          <li>Healthy fats — avocado, nuts, olive oil</li>
+          <li>Water — 8–10 cups daily to stay hydrated and reduce swelling</li>
+        </ul>
+      </div>
+      <div class="nutr-card pink">
+        <div class="nutr-card-title">🚫 Foods to Avoid</div>
+        <ul class="nutr-list">
+          <li>Raw or undercooked meat, fish, eggs</li>
+          <li>High-mercury fish: shark, swordfish, king mackerel, tilefish</li>
+          <li>Unpasteurized dairy and juices</li>
+          <li>Deli meats and hot dogs (unless heated until steaming)</li>
+          <li>Alcohol — no safe amount during pregnancy</li>
+          <li>Limit caffeine to under 200 mg/day (about 1 small coffee)</li>
+        </ul>
+        <div class="nutr-tip">💡 <span>WIC provides free milk, eggs, fruits, vegetables, whole grains &amp; juice. Apply if you haven't already!</span></div>
+      </div>
+      <div class="nutr-card blue">
+        <div class="nutr-card-title">🤢 Managing Morning Sickness</div>
+        <ul class="nutr-list">
+          <li>Eat small meals every 2–3 hours — empty stomach makes nausea worse</li>
+          <li>Keep crackers by your bed — eat a few before getting up</li>
+          <li>Ginger tea or ginger candies can help</li>
+          <li>Avoid greasy, spicy, or strong-smelling foods</li>
+          <li>Stay hydrated — sip water, broth, or electrolyte drinks</li>
+          <li>Vitamin B6 (10–25 mg) may help — ask your provider</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="nutr-panel" id="nutr-postpartum">
+      <div class="nutr-card">
+        <div class="nutr-card-title">💪 Recovering After Birth</div>
+        <ul class="nutr-list">
+          <li><strong>Iron-rich foods</strong> — rebuild blood lost during delivery: spinach, beans, red meat, fortified cereal</li>
+          <li><strong>Protein</strong> — repairs tissues: eggs, chicken, fish, legumes, Greek yogurt</li>
+          <li><strong>Fiber</strong> — prevents postpartum constipation: fruits, veggies, whole grains, water</li>
+          <li><strong>Calcium</strong> — especially important if breastfeeding: dairy, fortified foods, leafy greens</li>
+          <li><strong>Vitamin C</strong> — supports wound healing: citrus, strawberries, bell peppers</li>
+        </ul>
+        <div class="nutr-tip">💡 <span>Continue your prenatal vitamin for at least 6 months postpartum, especially if breastfeeding.</span></div>
+      </div>
+      <div class="nutr-card orange">
+        <div class="nutr-card-title">🍼 Nutrition While Breastfeeding</div>
+        <ul class="nutr-list">
+          <li>You need about 400–500 extra calories per day while breastfeeding</li>
+          <li>Drink water every time you nurse — hydration is key</li>
+          <li>Keep eating DHA-rich foods for baby's brain development through breast milk</li>
+          <li>Limit caffeine to 1–2 cups/day</li>
+          <li>Some babies are sensitive to garlic or dairy in your diet — watch for fussiness</li>
+        </ul>
+        <div class="nutr-tip">💡 <span>WIC supports breastfeeding moms with extra food benefits &amp; free lactation support — (301) 883-7870.</span></div>
+      </div>
+      <div class="nutr-card pink">
+        <div class="nutr-card-title">😔 Food &amp; Mood: Postpartum Mental Health</div>
+        <ul class="nutr-list">
+          <li>Eat regularly — skipping meals drops blood sugar and worsens mood</li>
+          <li>Omega-3 rich foods support brain health: fish, walnuts, flaxseed</li>
+          <li>Limit sugar and ultra-processed foods that cause energy crashes</li>
+          <li>Stay hydrated — dehydration causes fatigue and irritability</li>
+        </ul>
+        <div class="nutr-tip">💡 <span>Feeling overwhelmed for more than 2 weeks? Reach out to Healthy Beginnings at (301) 883-7830.</span></div>
+      </div>
+    </div>
+
+    <div class="nutr-panel" id="nutr-baby">
+      <div class="nutr-card">
+        <div class="nutr-card-title">🤱 Breastfeeding Basics</div>
+        <ul class="nutr-list">
+          <li>Feed on demand — newborns typically eat every 1.5–3 hours (8–12 times/day)</li>
+          <li>Each feeding: 10–20 minutes per breast</li>
+          <li>Signs baby is getting enough: 6+ wet diapers/day, steady weight gain</li>
+          <li>Cluster feeding is normal — especially during growth spurts</li>
+        </ul>
+        <div class="nutr-tip">💡 <span>WIC offers free breast pumps and lactation counselors. Call (301) 883-7870.</span></div>
+      </div>
+      <div class="nutr-card orange">
+        <div class="nutr-card-title">🍼 Formula Feeding</div>
+        <ul class="nutr-list">
+          <li>Use iron-fortified infant formula for the first 12 months</li>
+          <li>Do NOT water down formula — it lacks nutrients when diluted</li>
+          <li>Feed on demand — newborns take 1.5–3 oz every 2–3 hours</li>
+          <li>Never prop a bottle — always hold baby during feeding</li>
+          <li>WIC provides free formula — call (301) 883-7870</li>
+        </ul>
+      </div>
+      <div class="nutr-card blue">
+        <div class="nutr-card-title">🥣 Starting Solid Foods (4–6 Months)</div>
+        <ul class="nutr-list">
+          <li>Wait for readiness: sits with support, head control, interest in food</li>
+          <li>Start with single-ingredient purees: sweet potato, squash, peas, fruits</li>
+          <li>Introduce one new food at a time, wait 3–5 days before another</li>
+          <li>No honey before 12 months (risk of botulism)</li>
+          <li>No cow's milk as main drink before 12 months</li>
+        </ul>
+        <div class="nutr-tip">💡 <span>WIC covers baby food &amp; cereal for infants 6–12 months. Use all your WIC benefits!</span></div>
+      </div>
+    </div>
+
+    <!-- Resource Tabs -->
+    <div class="section-title">📋 Resources For You</div>
+    <div class="category-tabs">
+      <button class="cat-tab active" onclick="filterCat('all',this)">All Resources</button>
+      <button class="cat-tab" onclick="filterCat('prenatal',this)">🏥 Prenatal</button>
+      <button class="cat-tab" onclick="filterCat('wic',this)">🥛 WIC</button>
+      <button class="cat-tab" onclick="filterCat('snap',this)">🛒 SNAP</button>
+      <button class="cat-tab" onclick="filterCat('diapers',this)">🧷 Diapers</button>
+      <button class="cat-tab" onclick="filterCat('food',this)">🍱 Food</button>
+      <button class="cat-tab" onclick="filterCat('insurance',this)">📋 Insurance</button>
+      <button class="cat-tab" onclick="filterCat('mental',this)">💜 Mental Health</button>
+      <button class="cat-tab" onclick="filterCat('daycare',this)">🏫 Daycare</button>
+      <button class="cat-tab" onclick="filterCat('scholarship',this)">🎓 Scholarship</button>
+      <button class="cat-tab" onclick="filterCat('teen',this)">🧑 Teen Services</button>
+      <button class="cat-tab" onclick="filterCat('transport',this)">🚌 Transportation</button>
+      <button class="cat-tab" onclick="filterCat('community',this)">🤝 Community</button>
+    </div>
+
+    <div class="resource-cards" id="resourceCards">
+
+      <!-- PRENATAL -->
+      <div class="resource-card blue" data-category="prenatal">
+        <div class="rc-header"><div class="rc-icon-title"><span class="rc-icon">🏥</span><div><div class="rc-title">PG County Health Dept – Prenatal Clinic</div><div class="rc-org">Prince George's County Health Dept</div></div></div><span class="rc-badge badge-blue">Prenatal</span></div>
+        <div class="ins-match-banner">✅ Accepts Medicaid / HealthChoice</div>
+        <div class="rc-desc">Free and low-cost prenatal visits, labs, and referrals. The Healthy Beginnings Program offers personalized support for healthy pregnancies.</div>
+        <div class="rc-details"><span class="rc-detail">📍 9314 Piscataway Rd, Clinton, MD</span><span class="rc-detail">📞 (301) 583-3700</span><span class="rc-detail">🕐 Mon–Fri 8am–4:30pm</span></div>
+        <div class="rc-actions"><button class="btn-sm btn-purple">📞 Call Now</button><button class="btn-sm btn-outline">🗺 Get Directions</button></div>
+      </div>
+
+      <div class="resource-card blue" data-category="prenatal">
+        <div class="rc-header"><div class="rc-icon-title"><span class="rc-icon">🏨</span><div><div class="rc-title">UM Capital Region Medical Center – OB/GYN</div><div class="rc-org">University of Maryland Medical System</div></div></div><span class="rc-badge badge-blue">Prenatal</span></div>
+        <div class="ins-match-banner">✅ Accepts Medicaid, Aetna, UHC, Priority Partners</div>
+        <div class="rc-desc">Full OB/GYN care including high-risk pregnancy, labor &amp; delivery, and postpartum services at the regional hospital in Largo.</div>
+        <div class="rc-details"><span class="rc-detail">📍 901 Harry S Truman Dr, Largo, MD</span><span class="rc-detail">📞 (301) 618-2000</span></div>
+        <div class="rc-actions"><button class="btn-sm btn-purple">📞 Call Now</button><button class="btn-sm btn-outline">🌐 Website</button></div>
+      </div>
+
+      <div class="resource-card blue" data-category="prenatal">
+        <div class="rc-header"><div class="rc-icon-title"><span class="rc-icon">🩺</span><div><div class="rc-title">Planned Parenthood – PG County Health Center</div><div class="rc-org">Suitland, MD</div></div></div><span class="rc-badge badge-blue">Prenatal</span></div>
+        <div class="ins-match-banner">✅ Sliding scale fees. Accepts most insurance.</div>
+        <div class="rc-desc">Prenatal and postpartum services, pregnancy testing, and referrals. Confidential care regardless of income or immigration status.</div>
+        <div class="rc-details"><span class="rc-detail">📍 4328 Saint Barnabas Rd, Suitland, MD</span><span class="rc-detail">📞 (240) 563-1220</span></div>
+        <div class="rc-actions"><button class="btn-sm btn-purple">📞 Call Now</button></div>
+      </div>
+
+      <!-- WIC -->
+      <div class="resource-card green" data-category="wic">
+        <div class="rc-header"><div class="rc-icon-title"><span class="rc-icon">🥛</span><div><div class="rc-title">WIC – Women, Infants &amp; Children</div><div class="rc-org">PG County Health Dept</div></div></div><span class="rc-badge badge-green">Free Program</span></div>
+        <div class="rc-desc">Free healthy foods, formula, nutrition counseling, and breastfeeding support for pregnant women, new mothers, and children under 5.</div>
+        <div class="rc-details"><span class="rc-detail">📍 Multiple PG County locations</span><span class="rc-detail">📞 (301) 883-7870</span></div>
+        <div class="rc-actions"><button class="btn-sm btn-purple">📞 Apply by Phone</button><button class="btn-sm btn-outline">🌐 Apply Online</button></div>
+      </div>
+
+      <!-- SNAP -->
+      <div class="resource-card orange" data-category="snap">
+        <div class="rc-header"><div class="rc-icon-title"><span class="rc-icon">🛒</span><div><div class="rc-title">SNAP Food Assistance</div><div class="rc-org">MD Dept of Social Services</div></div></div><span class="rc-badge badge-orange">Benefits</span></div>
+        <div class="rc-desc">Monthly food benefits on an EBT card. Pregnant women may qualify even with higher income. Apply at your local DSS office or online.</div>
+        <div class="rc-details"><span class="rc-detail">📍 805 Taylor St, Hyattsville, MD</span><span class="rc-detail">📞 (301) 699-8900</span><span class="rc-detail">🌐 marylandbenefits.gov</span></div>
+        <div class="rc-actions"><button class="btn-sm btn-purple">🌐 Apply Online</button><button class="btn-sm btn-outline">📞 Call DSS</button></div>
+      </div>
+
+      <!-- DIAPERS -->
+      <div class="resource-card pink" data-category="diapers">
+        <div class="rc-header"><div class="rc-icon-title"><span class="rc-icon">🧷</span><div><div class="rc-title">GHEP Community Diaper Program</div><div class="rc-org">Global Health &amp; Education Projects</div></div></div><span class="rc-badge badge-purple">Free Diapers</span></div>
+        <div class="rc-desc">Free diapers for families with infants and children ages 0–5 in PG County. No proof of income required.</div>
+        <div class="rc-details"><span class="rc-detail">📍 PG County distribution sites</span><span class="rc-detail">🌐 globalhealthprojects.org/diapers</span></div>
+        <div class="rc-actions"><button class="btn-sm btn-purple">🌐 Find Distribution</button></div>
+      </div>
+
+      <!-- FOOD -->
+      <div class="resource-card" data-category="food">
+        <div class="rc-header"><div class="rc-icon-title"><span class="rc-icon">🍱</span><div><div class="rc-title">PG County Food Pantry Network</div><div class="rc-org">PG County Food Equity Council</div></div></div><span class="rc-badge badge-purple">Free Food</span></div>
+        <div class="rc-desc">Find food pantries and distributions near you. No documentation required at most sites.</div>
+        <div class="rc-details"><span class="rc-detail">🌐 pgcfec.org/resources/find-food</span><span class="rc-detail">📞 2-1-1</span></div>
+        <div class="rc-actions"><button class="btn-sm btn-purple">🗺 Find Pantry Near Me</button></div>
+      </div>
+
+      <div class="resource-card" data-category="food">
+        <div class="rc-header"><div class="rc-icon-title"><span class="rc-icon">🏙️</span><div><div class="rc-title">Greenbelt Food Distribution</div><div class="rc-org">City of Greenbelt</div></div></div><span class="rc-badge badge-green">Regular Event</span></div>
+        <div class="rc-desc">Food distributions every 3rd Thursday at Greenbelt Community Center (1–3pm) and Springhill Lake Recreation Center (3–4pm).</div>
+        <div class="rc-details"><span class="rc-detail">📍 25 Crescent Rd, Greenbelt, MD</span><span class="rc-detail">🕐 Every 3rd Thursday</span></div>
+        <div class="rc-actions"><button class="btn-sm btn-outline">📅 Add to Calendar</button></div>
+      </div>
+
+      <!-- INSURANCE -->
+      <div class="resource-card" data-category="insurance" style="border-left-color:#3b82f6">
+        <div class="rc-header"><div class="rc-icon-title"><span class="rc-icon">📋</span><div><div class="rc-title">Maryland Medicaid for Pregnant Women</div><div class="rc-org">Maryland Health Connection</div></div></div><span class="rc-badge badge-blue">Free Coverage</span></div>
+        <div class="rc-desc">Earn $15,856–$38,775/year? You may qualify for free Medicaid while pregnant. Covers prenatal visits, delivery, and postpartum care. Apply year-round.</div>
+        <div class="rc-details"><span class="rc-detail">📞 1-855-642-8572</span><span class="rc-detail">🌐 MarylandHealthConnection.gov</span></div>
+        <div class="rc-actions"><button class="btn-sm btn-purple">🌐 Apply Now</button><button class="btn-sm btn-outline">📞 Call Helpline</button></div>
+      </div>
+
+      <div class="resource-card" data-category="insurance" style="border-left-color:#3b82f6">
+        <div class="rc-header"><div class="rc-icon-title"><span class="rc-icon">👶</span><div><div class="rc-title">Maryland Children's Health Program (MCHP)</div><div class="rc-org">PG County Health Dept</div></div></div><span class="rc-badge badge-blue">For Kids</span></div>
+        <div class="rc-desc">Free health insurance for pregnant women and children with moderate to low income. Covers dental, doctor visits, and prescriptions.</div>
+        <div class="rc-details"><span class="rc-detail">📍 9314 Piscataway Rd, Clinton, MD</span><span class="rc-detail">📞 (301) 583-3700</span></div>
+        <div class="rc-actions"><button class="btn-sm btn-purple">📞 Enroll Today</button></div>
+      </div>
+
+      <!-- MENTAL HEALTH -->
+      <div class="resource-card" data-category="mental" style="border-left-color:#8b5cf6">
+        <div class="rc-header"><div class="rc-icon-title"><span class="rc-icon">💜</span><div><div class="rc-title">Healthy Beginnings – Home Visiting Program</div><div class="rc-org">PG County Health Dept</div></div></div><span class="rc-badge badge-purple">Free Service</span></div>
+        <div class="rc-desc">Personalized home visits during pregnancy and after birth. Covers mental health check-ins, postpartum depression screening, and parenting support.</div>
+        <div class="rc-details"><span class="rc-detail">📞 (301) 883-7830</span></div>
+        <div class="rc-actions"><button class="btn-sm btn-purple">📞 Get Referred</button></div>
+      </div>
+
+      <!-- DAYCARE -->
+      <div class="resource-card" data-category="daycare" style="border-left-color:#f59e0b">
+        <div class="rc-header"><div class="rc-icon-title"><span class="rc-icon">🏫</span><div><div class="rc-title">PG County Licensed Childcare Finder</div><div class="rc-org">Maryland Family Network</div></div></div><span class="rc-badge badge-orange">Daycare</span></div>
+        <div class="rc-desc">Search licensed daycares, infant centers, and family childcare homes in PG County and surrounding areas (Prince George's, Anne Arundel, Montgomery, DC). Filter by age, hours, and subsidy acceptance.</div>
+        <div class="rc-details"><span class="rc-detail">📞 1-877-261-0060</span><span class="rc-detail">🌐 marylandchildcare.org</span></div>
+        <div class="rc-actions"><button class="btn-sm btn-purple">🌐 Search Daycares</button><button class="btn-sm btn-outline">📞 Call Helpline</button></div>
+      </div>
+
+      <div class="resource-card" data-category="daycare" style="border-left-color:#f59e0b">
+        <div class="rc-header"><div class="rc-icon-title"><span class="rc-icon">🎠</span><div><div class="rc-title">PG County Head Start &amp; Early Head Start</div><div class="rc-org">PG County Public Schools / PGCPS</div></div></div><span class="rc-badge badge-orange">Free Program</span></div>
+        <div class="rc-desc">FREE comprehensive early childhood program for income-eligible families. Serves children ages 0–5. Includes childcare, health screenings, meals, and family support services. Sites across PG County.</div>
+        <div class="rc-details"><span class="rc-detail">📞 (301) 386-7900</span><span class="rc-detail">🌐 pgcps.org/head-start</span><span class="rc-detail">🕐 Enrollment opens annually in spring</span></div>
+        <div class="rc-actions"><button class="btn-sm btn-purple">📞 Apply Now</button><button class="btn-sm btn-outline">🌐 Learn More</button></div>
+      </div>
+
+      <div class="resource-card" data-category="daycare" style="border-left-color:#f59e0b">
+        <div class="rc-header"><div class="rc-icon-title"><span class="rc-icon">🌻</span><div><div class="rc-title">DC / Northern Virginia Childcare Options</div><div class="rc-org">Surrounding Area Resources</div></div></div><span class="rc-badge badge-orange">Nearby</span></div>
+        <div class="rc-desc">PG County families near the DC border may also access subsidized childcare in DC (Child Care Assistance Program) and Montgomery County (Extended Care). Call 211 for a full referral list.</div>
+        <div class="rc-details"><span class="rc-detail">📞 2-1-1 (free referral line)</span><span class="rc-detail">🌐 osse.dc.gov (DC childcare)</span></div>
+        <div class="rc-actions"><button class="btn-sm btn-outline">📞 Call 2-1-1</button></div>
+      </div>
+
+      <!-- CHILDCARE SCHOLARSHIP / DSS -->
+      <div class="resource-card" data-category="scholarship" style="border-left-color:#10b981">
+        <div class="rc-header"><div class="rc-icon-title"><span class="rc-icon">🎓</span><div><div class="rc-title">Maryland Child Care Scholarship (CCS)</div><div class="rc-org">MD Office of Child Care / DSS</div></div></div><span class="rc-badge badge-green">Subsidy Program</span></div>
+        <div class="rc-desc">The Maryland Child Care Scholarship helps eligible families pay for licensed daycare at a significantly reduced cost — sometimes free. You may qualify if you are working, in school, or in job training and your income is at or below 85% of the State Median Income.</div>
+        <div class="rc-details"><span class="rc-detail">📍 Apply through PG County DSS: 805 Taylor St, Hyattsville, MD</span><span class="rc-detail">📞 (301) 699-8900</span><span class="rc-detail">🌐 mdchildcare.org/scholarship</span></div>
+        <div class="rc-actions"><button class="btn-sm btn-purple">🌐 Apply Online</button><button class="btn-sm btn-outline">📞 Call DSS</button></div>
+      </div>
+
+      <div class="resource-card" data-category="scholarship" style="border-left-color:#10b981">
+        <div class="rc-header"><div class="rc-icon-title"><span class="rc-icon">📝</span><div><div class="rc-title">How to Apply for CCS Through DSS</div><div class="rc-org">Step-by-Step Guide</div></div></div><span class="rc-badge badge-green">Apply Guide</span></div>
+        <div class="rc-desc">
+          <strong>Step 1</strong> — Check eligibility: you must be working, in school, or in job training. Child must be under 13 (or under 19 if special needs).<br><br>
+          <strong>Step 2</strong> — Gather documents: photo ID, proof of income (pay stubs or award letter), proof of residency (utility bill or lease), child's birth certificate, and proof of school/work enrollment.<br><br>
+          <strong>Step 3</strong> — Apply at PG County DSS (805 Taylor St, Hyattsville), call (301) 699-8900, or apply online at marylandbenefits.gov.<br><br>
+          <strong>Step 4</strong> — Choose a licensed provider that accepts CCS. Search at marylandchildcare.org.<br><br>
+          <strong>Step 5</strong> — Renew annually. DSS will send a renewal notice — respond promptly to avoid gaps in coverage.
+        </div>
+        <div class="rc-details"><span class="rc-detail">📞 (301) 699-8900</span><span class="rc-detail">🌐 marylandbenefits.gov</span></div>
+        <div class="rc-actions"><button class="btn-sm btn-purple">🌐 Apply at DSS Online</button><button class="btn-sm btn-outline">📞 Call for Help</button></div>
+      </div>
+
+      <!-- TEEN SERVICES -->
+      <div class="resource-card" data-category="teen" style="border-left-color:#f59e0b">
+        <div class="rc-header"><div class="rc-icon-title"><span class="rc-icon">🧑</span><div><div class="rc-title">Teen Pregnancy &amp; Parenting Program (TAPP)</div><div class="rc-org">PG County Health Dept</div></div></div><span class="rc-badge badge-orange">Ages 13–19</span></div>
+        <div class="rc-desc">Free case management, prenatal care coordination, and parenting classes for teens and young parents in PG County. Includes transportation assistance to appointments.</div>
+        <div class="rc-details"><span class="rc-detail">📞 (301) 883-7830</span><span class="rc-detail">🕐 Mon–Fri 8am–4:30pm</span></div>
+        <div class="rc-actions"><button class="btn-sm btn-purple">📞 Call to Enroll</button></div>
+      </div>
+
+      <div class="resource-card" data-category="teen" style="border-left-color:#f59e0b">
+        <div class="rc-header"><div class="rc-icon-title"><span class="rc-icon">🎓</span><div><div class="rc-title">PGCPS Pregnant &amp; Parenting Student Support</div><div class="rc-org">Prince George's County Public Schools</div></div></div><span class="rc-badge badge-orange">In-School</span></div>
+        <div class="rc-desc">Title IX protections ensure pregnant and parenting students can stay enrolled with flexible scheduling and makeup work accommodations. Talk to your school counselor.</div>
+        <div class="rc-details"><span class="rc-detail">📞 (301) 952-6000</span><span class="rc-detail">🌐 pgcps.org</span></div>
+        <div class="rc-actions"><button class="btn-sm btn-outline">🌐 Learn Your Rights</button></div>
+      </div>
+
+      <!-- TRANSPORTATION -->
+      <div class="resource-card" data-category="transport" style="border-left-color:#06b6d4">
+        <div class="rc-header"><div class="rc-icon-title"><span class="rc-icon">🚌</span><div><div class="rc-title">MD Medicaid Non-Emergency Transport</div><div class="rc-org">Maryland Medicaid / MTM</div></div></div><span class="rc-badge badge-blue">Free Rides</span></div>
+        <div class="rc-desc">Free rides to medical appointments for Medicaid members — prenatal visits, WIC, pharmacy, specialists. Schedule at least 3 days in advance.</div>
+        <div class="rc-details"><span class="rc-detail">📞 1-866-385-9768</span><span class="rc-detail">🕐 Schedule 3+ days ahead</span></div>
+        <div class="rc-actions"><button class="btn-sm btn-purple">📞 Schedule a Ride</button></div>
+      </div>
+
+      <div class="resource-card" data-category="transport" style="border-left-color:#06b6d4">
+        <div class="rc-header"><div class="rc-icon-title"><span class="rc-icon">🚐</span><div><div class="rc-title">TheBus – PG County Transit</div><div class="rc-org">Prince George's County Transit</div></div></div><span class="rc-badge badge-blue">Public Transit</span></div>
+        <div class="rc-desc">Local bus service connecting neighborhoods to Metro stations, hospitals, clinics, and community centers. Reduced fares for Medicaid and low-income riders.</div>
+        <div class="rc-details"><span class="rc-detail">📞 (301) 883-5656</span><span class="rc-detail">🌐 princegeorgescountymd.gov/thebus</span></div>
+        <div class="rc-actions"><button class="btn-sm btn-purple">🗺 Plan My Trip</button><button class="btn-sm btn-outline">📞 Call Transit</button></div>
+      </div>
+
+      <!-- COMMUNITY GROUPS -->
+      <div class="resource-card" data-category="community" style="border-left-color:#10b981">
+        <div class="rc-header"><div class="rc-icon-title"><span class="rc-icon">🙏</span><div><div class="rc-title">Seat Pleasant Community Church – Diaper &amp; Food Drive</div><div class="rc-org">Seat Pleasant, MD</div></div></div><span class="rc-badge badge-green">Monthly</span></div>
+        <div class="rc-desc">Free diapers (newborn–size 6), wipes, and non-perishable food boxes distributed the 1st Saturday of each month. No ID or proof of income required.</div>
+        <div class="rc-details"><span class="rc-detail">📍 5720 Addison Rd, Seat Pleasant, MD</span><span class="rc-detail">🕐 1st Saturday, 9am–12pm</span></div>
+        <div class="rc-actions"><button class="btn-sm btn-outline">📅 Add to Calendar</button></div>
+      </div>
+
+      <div class="resource-card" data-category="community" style="border-left-color:#10b981">
+        <div class="rc-header"><div class="rc-icon-title"><span class="rc-icon">🍽️</span><div><div class="rc-title">Greater Mount Calvary Holy Church – Weekly Food Pantry</div><div class="rc-org">Capitol Heights, MD</div></div></div><span class="rc-badge badge-green">Every Saturday</span></div>
+        <div class="rc-desc">Free groceries every Saturday morning. Fresh produce, canned goods, bread, and baby items when available. Pregnant women and families prioritized.</div>
+        <div class="rc-details"><span class="rc-detail">📍 610 Rhode Island Ave NE, Capitol Heights, MD</span><span class="rc-detail">🕐 Every Saturday, 8am–11am</span></div>
+        <div class="rc-actions"><button class="btn-sm btn-purple">🗺 Get Directions</button></div>
+      </div>
+
+      <div class="resource-card" data-category="community" style="border-left-color:#10b981">
+        <div class="rc-header"><div class="rc-icon-title"><span class="rc-icon">🤝</span><div><div class="rc-title">Moms in Motion PG – Mutual Aid Network</div><div class="rc-org">PG County Community Group</div></div></div><span class="rc-badge badge-green">Community Led</span></div>
+        <div class="rc-desc">Grassroots mutual aid group connecting pregnant moms and new parents with donated diapers, baby gear, formula, and meals.</div>
+        <div class="rc-details"><span class="rc-detail">🌐 Search "Moms in Motion PG County" on Facebook</span></div>
+        <div class="rc-actions"><button class="btn-sm btn-outline">🌐 Find on Facebook</button></div>
+      </div>
+
+    </div><!-- /resource-cards -->
+
+    <!-- Upcoming Events -->
+    <div class="section-title" style="margin-top:28px">📅 Upcoming Community Events</div>
+    <div class="events-list">
+      <div class="event-card">
+        <div class="event-date"><div class="month">OCT</div><div class="day">3</div></div>
+        <div class="event-info"><div class="event-title">Free Diaper &amp; Wipes Distribution</div><div class="event-meta">9am–12pm · Seat Pleasant Activity Center, 5720 Addison Rd</div><div class="event-tags"><span class="tag tag-pink">Diapers</span><span class="tag tag-green">Free</span></div><button class="reg-btn" onclick="openRegModal('Free Diaper &amp; Wipes Distribution','October 3 · 9am–12pm','Seat Pleasant Activity Center')">📅 Register</button></div>
+      </div>
+      <div class="event-card">
+        <div class="event-date"><div class="month">OCT</div><div class="day">17</div></div>
+        <div class="event-info"><div class="event-title">Greenbelt Food Distribution</div><div class="event-meta">1–3pm · Greenbelt Community Center, 25 Crescent Rd</div><div class="event-tags"><span class="tag tag-green">Food</span><span class="tag tag-green">Free</span></div><button class="reg-btn" onclick="openRegModal('Greenbelt Food Distribution','October 17 · 1–3pm','Greenbelt Community Center')">📅 Register</button></div>
+      </div>
+      <div class="event-card">
+        <div class="event-date"><div class="month">OCT</div><div class="day">22</div></div>
+        <div class="event-info"><div class="event-title">WIC Enrollment Help Day</div><div class="event-meta">10am–2pm · PG County Health Dept, Clinton</div><div class="event-tags"><span class="tag tag-blue">WIC</span><span class="tag tag-green">Benefits</span></div><button class="reg-btn" onclick="openRegModal('WIC Enrollment Help Day','October 22 · 10am–2pm','PG County Health Dept, Clinton')">📅 Register</button></div>
+      </div>
+      <div class="event-card">
+        <div class="event-date" style="background:var(--pink)"><div class="month">NOV</div><div class="day">5</div></div>
+        <div class="event-info"><div class="event-title">Prenatal Wellness Fair</div><div class="event-meta">11am–3pm · Kentland Community Center, Landover</div><div class="event-tags"><span class="tag tag-pink">Prenatal</span><span class="tag tag-blue">Resources</span></div><button class="reg-btn" onclick="openRegModal('Prenatal Wellness Fair','November 5 · 11am–3pm','Kentland Community Center, Landover')">📅 Register</button></div>
+      </div>
+      <div class="event-card">
+        <div class="event-date" style="background:#f59e0b"><div class="month">OCT</div><div class="day">12</div></div>
+        <div class="event-info"><div class="event-title">Teen Parent Resource Day – TAPP Program</div><div class="event-meta">10am–2pm · PG County Health Dept, Clinton</div><div class="event-tags"><span class="tag tag-blue">Teen Services</span><span class="tag tag-green">Free</span></div><button class="reg-btn" onclick="openRegModal('Teen Parent Resource Day','October 12 · 10am–2pm','PG County Health Dept, Clinton')">📅 Register</button></div>
+      </div>
+      <div class="event-card">
+        <div class="event-date" style="background:#10b981"><div class="month">NOV</div><div class="day">2</div></div>
+        <div class="event-info"><div class="event-title">Glenarden Baby Essentials Pop-Up</div><div class="event-meta">10am–1pm · Glenarden Municipal Center, 8600 Glenarden Pkwy</div><div class="event-tags"><span class="tag tag-pink">Diapers</span><span class="tag tag-green">Baby Items</span></div><button class="reg-btn" onclick="openRegModal('Glenarden Baby Essentials Pop-Up','November 2 · 10am–1pm','Glenarden Municipal Center')">📅 Register</button></div>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <div style="margin-top:28px;padding:18px;background:white;border-radius:14px;text-align:center;color:var(--gray);font-size:0.83rem;box-shadow:var(--shadow);">
+      <p>🌸 <strong>MamaCare PG</strong> · Prince George's County, Maryland</p>
+      <p style="margin-top:4px">For emergencies call 911 · Crisis line: 988</p>
+    </div>
+    <div style="height:80px"></div>
+  </div>
+</div>
+
+<!-- EVENT REGISTRATION MODAL -->
+<div class="modal-overlay" id="regModal">
+  <div class="modal-box">
+    <div class="modal-title" id="regModalTitle">Register for Event</div>
+    <div class="modal-sub" id="regModalSub"></div>
+    <div class="form-group"><label>Your Name</label><input type="text" id="regModalName" placeholder="Maria Johnson"/></div>
+    <div class="form-group"><label>Phone or Email (for reminder)</label><input type="text" id="regModalContact" placeholder="you@email.com or (301) 555-0000"/></div>
+    <div class="reg-success" id="regSuccess">✅ You're registered! Download your calendar invite below.<br><a id="icsLink" href="#" download="event.ics" style="color:var(--purple);font-weight:700;text-decoration:underline;margin-top:6px;display:inline-block">📅 Download Calendar Invite (.ics)</a></div>
+    <div class="modal-actions" id="regModalActions">
+      <button class="modal-cancel" onclick="closeRegModal()">Cancel</button>
+      <button class="modal-confirm" onclick="confirmRegistration()">📅 Register &amp; Add to Calendar</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toastEl">
+  <div class="toast-icon" id="toastIcon">📅</div>
+  <div class="toast-body"><strong id="toastTitle"></strong><span id="toastMsg"></span></div>
+</div>
+
+<!-- CHAT FAB -->
+<button class="chat-fab visible" id="chatFab" onclick="toggleChat()" aria-label="Open chat">💬</button>
+<div class="chat-window chat-hidden" id="chatWindow">
+  <div class="chat-header">
+    <div class="chat-header-title">🌸 MamaCare Assistant</div>
+    <button class="chat-close" onclick="toggleChat()">✕</button>
+  </div>
+  <div class="chat-messages" id="chatMessages">
+    <div class="msg msg-bot">Hi! 👋 I'm your MamaCare helper. Ask me anything about resources, WIC, transportation, daycare, scholarships, or your pregnancy!</div>
+  </div>
+  <div class="chat-quick" id="chatQuick">
+    <button class="quick-btn" onclick="quickAsk('How do I apply for WIC?')">🥛 WIC</button>
+    <button class="quick-btn" onclick="quickAsk('How do I get free rides to appointments?')">🚌 Free rides</button>
+    <button class="quick-btn" onclick="quickAsk('How do I apply for the childcare scholarship?')">🎓 Scholarship</button>
+    <button class="quick-btn" onclick="quickAsk('Where can I find free diapers?')">🧷 Diapers</button>
+    <button class="quick-btn" onclick="quickAsk('How do I apply for Medicaid?')">📋 Medicaid</button>
+    <button class="quick-btn" onclick="quickAsk('Where is daycare near me?')">🏫 Daycare</button>
+    <button class="quick-btn" onclick="quickAsk('Is there teen parent support?')">🧑 Teen help</button>
+    <button class="quick-btn" onclick="quickAsk('What events are coming up?')">📅 Events</button>
+  </div>
+  <div class="chat-input-row">
+    <input class="chat-input" id="chatInput" placeholder="Ask a question…" onkeydown="if(event.key==='Enter')sendChat()"/>
+    <button class="chat-send" onclick="sendChat()">➤</button>
+  </div>
+</div>
+
+<script>
+// ── STATE ──
+let lang = 'en';
+let step = 1;
+const TOTAL = 5;
+let userData = { name:'Maria', insurance:'medicaid', zip:'20743', status:[], pregnant:false, pregWeek:0, otherKids:'none' };
+let users = [{ email:'demo@mamacare.com', password:'password123', name:'Maria' }];
+let pendingEvent = {};
+const QUOTES = [
+  { text:"You are stronger than you know and braver than you feel. Every day you choose your baby is a act of love.", author:"— MamaCare PG" },
+  { text:"Growing a life is the most extraordinary thing a body can do. Be gentle with yourself.", author:"— MamaCare PG" },
+  { text:"You don't have to have it all figured out. You just have to take it one day at a time.", author:"— MamaCare PG" },
+  { text:"Your baby is lucky to have someone who cares so much before they've even arrived.", author:"— MamaCare PG" },
+  { text:"Rest is not laziness. Rest is how you take care of both of you.", author:"— MamaCare PG" },
+  { text:"Ask for help. Accept help. You were never meant to do this alone.", author:"— MamaCare PG" },
+  { text:"Every kick, every heartbeat, every moment of discomfort is proof of your incredible strength.", author:"— MamaCare PG" },
+  { text:"You are doing a beautiful, difficult, important thing. We see you.", author:"— MamaCare PG" },
+  { text:"Nourishing yourself is not selfish — it is the most loving thing you can do for your baby.", author:"— MamaCare PG" },
+  { text:"The village is here. You don't have to carry this alone.", author:"— MamaCare PG" },
+  { text:"Being a mother is learning about strengths you didn't know you had.", author:"— Linda Wooten" },
+  { text:"You were given this life because you are strong enough to live it.", author:"— Unknown" },
+  { text:"She believed she could, so she did.", author:"— R.S. Grey" },
+  { text:"There is no way to be a perfect mother, but a million ways to be a good one.", author:"— Jill Churchill" },
+  { text:"You are enough. You have enough. You do enough.", author:"— MamaCare PG" }
+];
+let quoteIdx = Math.floor(Math.random() * QUOTES.length);
+
+function newQuote() {
+  quoteIdx = (quoteIdx + 1) % QUOTES.length;
+  const q = QUOTES[quoteIdx];
+  document.getElementById('quoteText').textContent = q.text;
+  document.getElementById('quoteAuthor').textContent = q.author;
+}
+
+// ── LANG ──
+function toggleLang() {
+  lang = lang === 'en' ? 'es' : 'en';
+  document.getElementById('langLabel').textContent = lang === 'en' ? 'Español' : 'English';
+}
+function applyLangPref() {
+  const s = document.getElementById('prefLang');
+  if (s) lang = s.value;
+  document.getElementById('langLabel').textContent = lang === 'en' ? 'Español' : 'English';
+}
+
+// ── LOGIN ──
+function switchTab(tab) {
+  document.getElementById('signinForm').style.display = tab==='signin' ? 'block' : 'none';
+  document.getElementById('registerForm').style.display = tab==='register' ? 'block' : 'none';
+  document.getElementById('tabSignIn').classList.toggle('active', tab==='signin');
+  document.getElementById('tabRegister').classList.toggle('active', tab==='register');
+}
+function doLogin() {
+  const email = document.getElementById('loginEmail').value.trim();
+  const pass  = document.getElementById('loginPassword').value;
+  const user  = users.find(u => u.email===email && u.password===pass);
+  if (user) {
+    userData.name = user.name;
+    document.getElementById('loginError').style.display = 'none';
+    afterLogin();
+  } else {
+    document.getElementById('loginError').style.display = 'block';
+  }
+}
+function doRegister() {
+  const name = document.getElementById('regName').value.trim();
+  const email= document.getElementById('regEmail').value.trim();
+  const pass = document.getElementById('regPassword').value;
+  if (!name||!email||!pass) { alert('Please fill in all fields.'); return; }
+  users.push({email,password:pass,name});
+  userData.name = name;
+  afterLogin();
+}
+function guestLogin() {
+  userData.name = 'Friend';
+  afterLogin();
+}
+function afterLogin() {
+  showNav(userData.name);
+  showScreen('onboardScreen');
+  goToStep(1);
+}
+function logout() {
+  userData = { name:'', insurance:'medicaid', zip:'20743', status:[], pregnant:false, pregWeek:0, otherKids:'none' };
+  step = 1;
+  document.getElementById('navUser').style.display = 'none';
+  document.getElementById('logoutBtn').style.display = 'none';
+  document.getElementById('trackerNavBtn').style.display = 'none';
+  document.querySelectorAll('.ins-card').forEach(c=>c.classList.remove('selected'));
+  document.querySelectorAll('.option-card').forEach(c=>c.classList.remove('selected'));
+  document.querySelectorAll('.svc-item').forEach(c=>{c.classList.remove('checked');c.querySelector('input').checked=false;});
+  document.querySelectorAll('.race-item').forEach(c=>{c.classList.remove('checked');c.querySelector('input').checked=false;});
+  document.getElementById('pregnancyDetail').style.display='none';
+  showScreen('loginScreen');
+}
+function showNav(name) {
+  document.getElementById('navUser').textContent = '👤 ' + name;
+  document.getElementById('navUser').style.display = 'inline';
+  document.getElementById('logoutBtn').style.display = 'inline-block';
+}
+
+// ── SCREENS ──
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+// ── ONBOARDING ──
+function goToStep(n) {
+  document.querySelectorAll('.step').forEach(s=>s.classList.remove('active'));
+  document.getElementById('step'+n).classList.add('active');
+  step = n;
+  document.getElementById('progressBar').style.width = (n/TOTAL*100)+'%';
+  window.scrollTo(0,0);
+}
+function nextStep(from) { if (from < TOTAL) goToStep(from+1); }
+function prevStep(from) { if (from > 1) goToStep(from-1); }
+
+function toggleStatus(el) {
+  el.classList.toggle('selected');
+  const val = el.dataset.val;
+  const idx = userData.status.indexOf(val);
+  if (idx === -1) userData.status.push(val); else userData.status.splice(idx,1);
+  const isPregnant = userData.status.includes('pregnant');
+  userData.pregnant = isPregnant;
+  document.getElementById('pregnancyDetail').style.display = isPregnant ? 'block' : 'none';
+}
+
+function selectIns(el) {
+  document.querySelectorAll('.ins-card').forEach(c=>c.classList.remove('selected'));
+  el.classList.add('selected');
+  userData.insurance = el.dataset.val;
+}
+
+function toggleSvc(el) {
+  el.classList.toggle('checked');
+  const cb = el.querySelector('input[type="checkbox"]');
+  cb.checked = !cb.checked;
+}
+
+function toggleRace(el) {
+  el.classList.toggle('checked');
+  const cb = el.querySelector('input[type="checkbox"]');
+  cb.checked = !cb.checked;
+}
+
+function showDashboard() {
+  userData.zip = document.getElementById('zip').value || '20743';
+  const firstName = document.getElementById('firstName').value.trim();
+  if (firstName) userData.name = firstName;
+  userData.name = userData.name || 'Friend';
+  userData.otherKids = document.getElementById('otherKids').value || 'none';
+
+  // figure out pregnancy week
+  const wkInput = document.getElementById('pregWeek').value;
+  const lpInput = document.getElementById('lastPeriod').value;
+  if (wkInput) {
+    userData.pregWeek = parseInt(wkInput);
+  } else if (lpInput) {
+    const lp = new Date(lpInput);
+    const today = new Date();
+    userData.pregWeek = Math.floor((today - lp) / (7*24*60*60*1000));
+  }
+
+  // Update hero
+  document.getElementById('dashGreeting').textContent = 'Hi, ' + userData.name + '! 👋';
+  document.getElementById('pillZip').textContent = '📍 ' + userData.zip;
+  const insLabels = { medicaid:'Medicaid', priority:'Priority Partners', uhc:'UnitedHealthcare', aetna:'Aetna Better Health', private:'Private Insurance', none:'No Insurance' };
+  document.getElementById('pillInsurance').textContent = insLabels[userData.insurance] || 'Medicaid';
+
+  // update insurance banners
+  const medicaidPlans = ['medicaid','priority','uhc','aetna'];
+  const isMedicaid = medicaidPlans.includes(userData.insurance);
+  document.querySelectorAll('.ins-match-banner,.ins-no-match').forEach(el => {
+    el.className = isMedicaid ? 'ins-match-banner' : 'ins-no-match';
+    if (!isMedicaid) el.innerHTML = '⚠️ May not accept your plan — call ahead to confirm';
+  });
+
+  // show tracker nav if pregnant
+  if (userData.pregnant) {
+    document.getElementById('trackerNavBtn').style.display = 'inline-block';
+  }
+
+  // set initial quote
+  const q = QUOTES[quoteIdx];
+  document.getElementById('quoteText').textContent = q.text;
+  document.getElementById('quoteAuthor').textContent = q.author;
+
+  showScreen('dashScreen');
+}
+
+// ── CATEGORY FILTER ──
+function filterCat(cat, btn) {
+  document.querySelectorAll('.cat-tab').forEach(t=>t.classList.remove('active'));
+  btn.classList.add('active');
+  document.querySelectorAll('.resource-card').forEach(card => {
+    const show = cat==='all' || card.dataset.category===cat;
+    card.style.display = show ? 'block' : 'none';
+  });
+}
+
+// ── NUTRITION TABS ──
+function switchNutr(panel, btn) {
+  document.querySelectorAll('.nutr-tab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.nutr-panel').forEach(p=>p.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('nutr-'+panel).classList.add('active');
+}
+
+// ── EVENT REGISTRATION ──
+function openRegModal(title, when, where) {
+  pendingEvent = { title, when, where };
+  document.getElementById('regModalTitle').textContent = '📅 ' + title;
+  document.getElementById('regModalSub').textContent = when + ' · ' + where;
+  document.getElementById('regSuccess').style.display = 'none';
+  document.getElementById('regModalActions').style.display = 'flex';
+  document.getElementById('regModalName').value = userData.name !== 'Friend' ? userData.name : '';
+  document.getElementById('regModalContact').value = '';
+  document.getElementById('regModal').classList.add('open');
+}
+function closeRegModal() {
+  document.getElementById('regModal').classList.remove('open');
+}
+function confirmRegistration() {
+  const name = document.getElementById('regModalName').value.trim() || userData.name;
+  // Build .ics content
+  const now = new Date();
+  const stamp = now.toISOString().replace(/[-:]/g,'').split('.')[0]+'Z';
+  const ics = [
+    'BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//MamaCare PG//EN',
+    'BEGIN:VEVENT',
+    'UID:'+stamp+'@mamacare-pg',
+    'DTSTAMP:'+stamp,
+    'DTSTART:'+stamp,
+    'SUMMARY:'+pendingEvent.title,
+    'DESCRIPTION:'+pendingEvent.when,
+    'LOCATION:'+pendingEvent.where,
+    'END:VEVENT','END:VCALENDAR'
+  ].join('\r\n');
+  const blob = new Blob([ics], {type:'text/calendar'});
+  const url  = URL.createObjectURL(blob);
+  document.getElementById('icsLink').href = url;
+  document.getElementById('icsLink').download = pendingEvent.title.replace(/[^a-z0-9]/gi,'_')+'.ics';
+  document.getElementById('regSuccess').style.display = 'block';
+  document.getElementById('regModalActions').style.display = 'none';
+  showToast('📅', 'Registered!', 'You\'re signed up for ' + pendingEvent.title);
+}
+function showToast(icon, title, msg) {
+  document.getElementById('toastIcon').textContent = icon;
+  document.getElementById('toastTitle').textContent = title;
+  document.getElementById('toastMsg').textContent = ' ' + msg;
+  const t = document.getElementById('toastEl');
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'), 4000);
+}
+
+// ── CHAT ──
+let chatOpen = false;
+function toggleChat() {
+  chatOpen = !chatOpen;
+  const w = document.getElementById('chatWindow');
+  const f = document.getElementById('chatFab');
+  w.classList.toggle('chat-hidden', !chatOpen);
+  f.textContent = chatOpen ? '✕' : '💬';
+  if (chatOpen) document.getElementById('chatInput').focus();
+}
+function quickAsk(q) { addMsg(q,'user'); setTimeout(()=>botReply(q),600); }
+function sendChat() {
+  const inp = document.getElementById('chatInput');
+  const q = inp.value.trim();
+  if (!q) return;
+  inp.value = '';
+  addMsg(q,'user');
+  setTimeout(()=>botReply(q),600);
+}
+function addMsg(text, who) {
+  const div = document.createElement('div');
+  div.className = 'msg msg-'+who;
+  div.textContent = text;
+  const msgs = document.getElementById('chatMessages');
+  msgs.appendChild(div);
+  msgs.scrollTop = msgs.scrollHeight;
+}
+function botReply(q) {
+  const lower = q.toLowerCase();
+  let reply = '';
+  if (lower.includes('wic')) {
+    reply = '🥛 WIC provides free foods, formula & nutrition support. Call (301) 883-7870 or visit Multiple PG County locations. Pregnant women, new moms, and kids under 5 qualify!';
+  } else if (lower.includes('ride') || lower.includes('transport') || lower.includes('bus')) {
+    reply = '🚌 If you have Medicaid, you get FREE rides to any medical appointment! Call MTM at 1-866-385-9768 — schedule at least 3 days ahead. Also check TheBus PG County at (301) 883-5656.';
+  } else if (lower.includes('scholarship') || lower.includes('childcare subsidy') || lower.includes('ccs')) {
+    reply = '🎓 The Maryland Child Care Scholarship (CCS) can help pay for licensed daycare at little to no cost. Apply through PG County DSS at 805 Taylor St, Hyattsville or call (301) 699-8900. You must be working, in school, or in job training.';
+  } else if (lower.includes('daycare') || lower.includes('child care') || lower.includes('childcare')) {
+    reply = '🏫 Search licensed daycares at marylandchildcare.org or call 1-877-261-0060. Head Start is FREE for eligible families — call (301) 386-7900. Ask about the Childcare Scholarship to reduce your costs!';
+  } else if (lower.includes('diaper')) {
+    reply = '🧷 GHEP offers free diapers in PG County — visit globalhealthprojects.org/diapers. Also check Seat Pleasant Community Church (1st Saturday 9am–12pm, 5720 Addison Rd) — no ID needed!';
+  } else if (lower.includes('medicaid') || lower.includes('insurance')) {
+    reply = '📋 Maryland Medicaid for Pregnant Women covers prenatal visits, delivery & postpartum. Apply year-round at MarylandHealthConnection.gov or call 1-855-642-8572.';
+  } else if (lower.includes('food') || lower.includes('snap') || lower.includes('pantry')) {
+    reply = '🍱 For SNAP benefits call (301) 699-8900 or visit marylandbenefits.gov. For food pantries call 2-1-1. Greenbelt Community Center hosts food distributions every 3rd Thursday 1–3pm.';
+  } else if (lower.includes('teen')) {
+    reply = '🧑 The TAPP program offers free case management and parenting classes for teens. Call (301) 883-7830. If you\'re in school, Title IX protects your right to stay enrolled — talk to your school counselor.';
+  } else if (lower.includes('event') || lower.includes('upcoming')) {
+    reply = '📅 Upcoming events: Oct 3 – Free Diapers (Seat Pleasant), Oct 17 – Greenbelt Food Distribution, Oct 22 – WIC Enrollment Help Day, Nov 5 – Prenatal Wellness Fair. Scroll down to register!';
+  } else if (lower.includes('mental') || lower.includes('stress') || lower.includes('depression') || lower.includes('sad')) {
+    reply = '💜 You\'re not alone. The Healthy Beginnings Home Visiting program offers free mental health support and postpartum depression screening — call (301) 883-7830. Crisis line: 988.';
+  } else if (lower.includes('nutrition') || lower.includes('eat') || lower.includes('food during pregnancy')) {
+    reply = '🥗 Check the Nutrition Guidance section at the top of your dashboard! Key nutrients: Folic acid, Iron, Calcium, DHA, Protein. Take a prenatal vitamin daily. WIC can provide free healthy foods!';
+  } else {
+    reply = '💜 I\'m here to help! You can ask me about WIC, free rides, diapers, food assistance, daycare, the childcare scholarship, Medicaid, mental health support, or upcoming events. What do you need?';
+  }
+  addMsg(reply, 'bot');
+}
+
+// init
+document.addEventListener('DOMContentLoaded', function() {
+  // show all resource cards by default
+  document.querySelectorAll('.resource-card').forEach(c => c.style.display = 'block');
+});
+</script>
+</body>
+</html>
